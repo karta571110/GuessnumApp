@@ -24,12 +24,12 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:ems="10"
-                android:hint="請問想猜幾位數?"
+                android:hint="請問想猜幾位數?(1~9位數擇一)"
                 android:inputType="textPersonName" />
 
             <Button
                 android:id="@+id/StartBtn"
-                android:layout_width="match_parent"
+                android:layout_width="480dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:text="開始玩" />
@@ -52,7 +52,7 @@
 
             <Button
                 android:id="@+id/GuessBtn"
-                android:layout_width="wrap_content"
+                android:layout_width="98dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="猜猜看" />
@@ -79,7 +79,7 @@
 
             <Button
                 android:id="@+id/ShowAnswer"
-                android:layout_width="114dp"
+                android:layout_width="107dp"
                 android:layout_height="wrap_content"
                 android:text="看答案" />
         </LinearLayout>
@@ -129,7 +129,7 @@
             android:orientation="vertical">
 
             <ListView
-                android:id="@+id/resultListView"
+                android:id="@+id/historyListView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </LinearLayout>
