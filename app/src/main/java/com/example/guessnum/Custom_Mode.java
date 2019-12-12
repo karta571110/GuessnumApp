@@ -31,8 +31,8 @@ public class Custom_Mode extends AppCompatActivity {
     private ListView historylistview;
     private ListAdapter laSimple;
     private ArrayList<String> listItems = new ArrayList<String>();
-    private Boolean playFlag;
-    private int playDigits, n, m,totalGuessTime=0;
+    private Boolean playFlag = false, bingoFlag;
+    private int playDigits, n, m, totalGuessTime = 0;
     private String strAnswer, strOutputString;
 
     @Override
@@ -127,8 +127,8 @@ public class Custom_Mode extends AppCompatActivity {
                     guessbtn.setEnabled(true);
                     showAnswerbtn.setEnabled(true);
 
-                    // 設定  guessEdittxt 的輸入長度
-                    playDigits = Integer.valueOf(guessEdittxt.getText().toString());
+                    // 設定 customrlueEdittxt 的輸入長度
+                    playDigits = Integer.valueOf(customrlueEdittxt.getText().toString());
 
                     //利用InputFilter限制EditText的長度(字符數)
                     InputFilter[] filterArray = new InputFilter[1];
@@ -144,43 +144,72 @@ public class Custom_Mode extends AppCompatActivity {
                     // 利用亂數產生一組數字, 儲放於 strAnswer
                     SetAnswer();
                 }
-                else
-                    {
-                    // 【輸入猜數位數模式】
-                    //設定 customrlueEdittxt,guessEdittxt屬性
-                    customrlueEdittxt.setText("");
-                    customrlueEdittxt.setEnabled(true);
-                    customrlueEdittxt.requestFocus();
-                    guessEdittxt.setText("");
-                    guessEdittxt.setEnabled(false);
+            }
+        });
 
-                    //設定guessbtn, showAnswerbtn
-                    guessbtn.setEnabled(false);
-                    showAnswerbtn.setEnabled(false);
+        restartbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //設定rstartbtn
+                // 【輸入猜數位數模式】
+                //設定 customrlueEdittxt,guessEdittxt屬性
+                customrlueEdittxt.setText("");
+                startbtn.setEnabled(true);
+                customrlueEdittxt.setEnabled(true);
+                customrlueEdittxt.requestFocus();
+                guessEdittxt.setText("");
+                guessEdittxt.setEnabled(false);
 
-                    // 清除 ListView 資料
-                    ClearResults();
+                //設定guessbtn, showAnswerbtn
+                guessbtn.setEnabled(false);
+                showAnswerbtn.setEnabled(false);
 
-                    }
+                // 清除 ListView 資料
+                ClearResults();
             }
         });
         guessbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(guessEdittxt.getText().toString().length()==playDigits)
-                    //輸入數字正確時
+                if (guessEdittxt.getText().toString().length() == playDigits)
+                //輸入數字正確時
                 {
                     //檢查猜對幾個數字
                     CheckMatchResult();
+                    // 顯示猜數結果
+                    ShowMatchResult();
+                }
+                else{
+                    Toast.makeText(Custom_Mode.this, "您輸入的位數過多或過少", Toast.LENGTH_LONG).show();
                 }
             }
         });
+        showAnswerbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //顯示答案
+                guessProcesstxt.setText("答案是  " + strAnswer);
+
+                //設定guessEdittxt屬性
+                guessEdittxt.setEnabled(false);
+                guessEdittxt.clearFocus();
+
+                //設定 guessbtn,showAnswerbtn
+                guessbtn.setEnabled(false);
+                showAnswerbtn.setEnabled(false);
+
+                // 隱藏 SoftKeyboard
+                HideSoftKeyboard();
+            }
+        });
+
+
     }
 
     private void SetAnswer() {
         // 產生一組 playDigits 位數的數字，並且將產生的數寀儲放於 strAnswer
         strAnswer = "";
-        for (int i = 0; i < playDigits; i++) {
+        for (int i = 1; i <=playDigits; i++) {
             int randomNo;
             boolean exitFlag;
             do {
@@ -191,12 +220,12 @@ public class Custom_Mode extends AppCompatActivity {
                     randomNo = generator.nextInt(10);
                 } while (randomNo == 0);
                 // 檢查這一個亂數整數與前面已產生的亂數整數是否重複
-                if (i > 0) {
-                    for (int j = 0; j <= (i - 1); j++) {
+                if (i > 1) {
+                    for (int j = 0; j <= (i - 2); j++) {
                         String chkDigiNo = strAnswer.substring(j, j + 1);
                         if (chkDigiNo.equals(String.valueOf(randomNo))) {
                             exitFlag = false;
-                        }
+                         }
                     }
                 }
             } while (i > 0 && (!exitFlag));
@@ -209,39 +238,79 @@ public class Custom_Mode extends AppCompatActivity {
             }
         }
     }
-private void ClearResults(){
-    // 清除 listItems 的所有資料
-    listItems.clear();
-    laSimple = new ArrayAdapter<String>(this,R.layout.my_list_row,listItems);
-    historylistview.setAdapter(laSimple);
-    //清除訊息區
-    totalGuessTime=0;
-    guessProcesstxt.setText(totalGuessTime+"次");
+
+    private void ClearResults() {
+        // 清除 listItems 的所有資料
+        listItems.clear();
+        laSimple = new ArrayAdapter<String>(this, R.layout.my_list_row, listItems);
+        historylistview.setAdapter(laSimple);
+        //清除訊息區
+        totalGuessTime = 0;
+        guessProcesstxt.setText("");
+        guessTimetxt.setText(totalGuessTime+"");
 
 
+    }
 
-}
-private void CheckMatchResult(){
-    // 檢查猜中幾個數字，傳回  n A , m B 結果
-    n=0;
-    m=0;
-    String strInputNumber=guessEdittxt.getText().toString();
-    for (int i=0;i<playDigits;i++){
-        String strInputDigit=strInputNumber.substring(i,i+1);
-        for (int j=0;j<playDigits;j++){
-            String strAnswerDigit=strAnswer.substring(j,j+1);
-            if(strAnswerDigit.equals(strInputDigit)){
-                if(i==j){ // 數字與位置都正確時，累計 n 值
-                    n++;
-                }
-                else {// 數字正確但位置不對時，累計 m 值
-                    m++;
+    private void CheckMatchResult() {
+        // 檢查猜中幾個數字，傳回  n A , m B 結果
+        n = 0;
+        m = 0;
+        String strInputNumber = guessEdittxt.getText().toString();
+        for (int i = 0; i < playDigits; i++) {
+            String strInputDigit = strInputNumber.substring(i, i + 1);
+            for (int j = 0; j < playDigits; j++) {
+                String strAnswerDigit = strAnswer.substring(j, j + 1);
+                if (strAnswerDigit.equals(strInputDigit)) {
+                    if (i == j) { // 數字與位置都正確時，累計 n 值
+                        n++;
+                    } else {// 數字正確但位置不對時，累計 m 值
+                        m++;
+                    }
                 }
             }
         }
-    }
-    // 將猜數字結果放入 strOutputString
+        // 將猜數字結果放入 strOutputString
+        if (n == playDigits) {
+            //BINGO
+            bingoFlag = true;
+            strOutputString = strInputNumber + "   " + "BINGO!!";
+        } else {
+            //nAmB
+            bingoFlag = false;
+            strOutputString = strInputNumber + "    " + n + " A " + m + " B ";
 
-}
+        }
+//將 strOutputString 放入 ListView 的 listItems
+        listItems.add(strOutputString);
+    }
+
+    private void ShowMatchResult() {
+        // 顯示 listItems 的所有資料
+        laSimple = new ArrayAdapter<String>(this,
+                R.layout.my_list_row,
+                listItems);
+        historylistview.setAdapter(laSimple);
+        //顯示訊息區
+        guessProcesstxt.setText(strOutputString);
+        //顯示猜測次數
+        totalGuessTime++;
+        guessTimetxt.setText(totalGuessTime + "次");
+        //清除guessEdittxt欄位
+        guessEdittxt.setText("");
+        if (bingoFlag)//BINGO時
+        {
+            // 設定  guessEdittxt 屬性
+            guessEdittxt.setEnabled(false);
+            guessEdittxt.clearFocus();
+            //設定  guessbtn,showAnswerbtn屬性
+            guessbtn.setEnabled(false);
+            showAnswerbtn.setEnabled(false);
+            //總共猜幾次
+            guessProcesstxt.setText("您總共猜了" + totalGuessTime + "次");
+        }
+        // 隱藏 SoftKeyboard
+        HideSoftKeyboard();
+    }
 }
 
