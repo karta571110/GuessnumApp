@@ -5,9 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,22 +52,21 @@ public class Play extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_custom__mode);
+        setContentView(R.layout.activity_play);
         Findviews();
-        SetAnswer();
         InitialSetup();
         SetButttonlistener();
-
+        SetAnswer();
     }
 
     private void Findviews() {
-        leveltxt = (TextView) findViewById(R.id.Leveltxt);//關卡
-        guessEdittxt = (EditText) findViewById(R.id.GuessEditText);//玩家輸入答案之輸入欄
-        guessbtn = (Button) findViewById(R.id.GuessBtn);//猜數字按鈕
-        showAnswerbtn = (Button) findViewById(R.id.ShowAnswer);//顯示答案
-        restartbtn = (Button) findViewById(R.id.RestartBtn);//重新開始按鈕
-        guessProcesstxt = (TextView) findViewById(R.id.GuessProcess);//上一次輸入的數字為?A?B
-        guessTimetxt = (TextView) findViewById(R.id.GuessTime);//猜測次數
+        leveltxt = (TextView) findViewById(R.id.Leveltxtplay); //關卡
+        guessEdittxt = (EditText) findViewById(R.id.GuessEditTextplay);//玩家輸入答案之輸入欄
+        guessbtn = (Button) findViewById(R.id.GuessBtnplay);//猜數字按鈕
+        showAnswerbtn = (Button) findViewById(R.id.ShowAnswerplay);//顯示答案
+        restartbtn = (Button) findViewById(R.id.RestartBtnplay);//重新開始按鈕
+        guessProcesstxt = (TextView) findViewById(R.id.GuessProcessplay);//上一次輸入的數字為?A?B
+        guessTimetxt = (TextView) findViewById(R.id.GuessTimeplay);//猜測次數
         historylistview = (ListView) findViewById(R.id.history);//歷史猜測紀錄
 
     }
@@ -97,7 +94,7 @@ public class Play extends AppCompatActivity {
         historylistview.setAdapter(laSimple);
 
         //清除訊息區
-        guessProcesstxt.setText("");
+
 
         //清除紀錄
         guessTimetxt.setText("0次");
@@ -114,9 +111,11 @@ public class Play extends AppCompatActivity {
         restartbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                playDigits = 1;
+                Toast.makeText(Play.this, "回到第一關", Toast.LENGTH_LONG).show();
                 //設定rstartbtn
                 SetAnswer();
-
+                guessProcesstxt.setText("");
                 // 清除 ListView 資料
                 ClearResults();
             }
@@ -139,16 +138,18 @@ public class Play extends AppCompatActivity {
         showAnswerbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 //顯示答案
                 guessProcesstxt.setText("答案是  " + strAnswer);
+                Toast.makeText(Play.this, " 您止步於" + playDigits + "關，答案已重置", Toast.LENGTH_LONG).show();
 
                 //設定guessEdittxt屬性
-                guessEdittxt.setEnabled(false);
-                guessEdittxt.clearFocus();
 
-                //設定 guessbtn,showAnswerbtn
-                guessbtn.setEnabled(false);
-                showAnswerbtn.setEnabled(false);
+                guessEdittxt.clearFocus();
+                totalGuessTime=0;
+                ClearResult();
+                SetAnswer();
+
 
                 // 隱藏 SoftKeyboard
                 HideSoftKeyboard();
@@ -199,7 +200,6 @@ public class Play extends AppCompatActivity {
         historylistview.setAdapter(laSimple);
         //清除訊息區
         totalGuessTime = 0;
-        guessProcesstxt.setText("");
         guessTimetxt.setText(totalGuessTime + "");
 
 
@@ -254,12 +254,20 @@ public class Play extends AppCompatActivity {
         if (bingoFlag)//BINGO時
         {
             playDigits++;
+            //leveltxt
+            leveltxt.setText("第" + playDigits + "關");
             // 設定  guessEdittxt 屬性
             guessEdittxt.setHint("請猜" + playDigits + "位數的數字");
 
 
             //總共猜幾次
-            guessProcesstxt.setText("您總共猜了" + totalGuessTime + "次");
+            guessProcesstxt.setText("您總共猜了" + totalGuessTime + "次 ");
+
+            Toast.makeText(Play.this, "進入下一關", Toast.LENGTH_LONG).show();
+            totalGuessTime = 0;
+            ClearResult();
+            guessTimetxt.setText("上一題答案是 "+strAnswer);
+            SetAnswer();
         }
         // 隱藏 SoftKeyboard
         HideSoftKeyboard();
