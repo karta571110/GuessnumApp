@@ -114,6 +114,8 @@ public class Play extends AppCompatActivity {
                 playDigits = 1;
                 Toast.makeText(Play.this, "回到第一關", Toast.LENGTH_LONG).show();
                 //設定rstartbtn
+                leveltxt.setText("第" + playDigits + "關");
+                guessEdittxt.setHint("請猜" + playDigits + "位數的數字");
                 SetAnswer();
                 guessProcesstxt.setText("");
                 // 清除 ListView 資料
